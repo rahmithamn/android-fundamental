@@ -21,5 +21,7 @@ class MainActivity : AppCompatActivity() {
                 .add(R.id.frame_container, mHomeFragment, HomeFragment::class.java.simpleName)
                 .commit()
         }
+
     }
+
 }
