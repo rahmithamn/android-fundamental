@@ -2,6 +2,7 @@ package com.rmn.myrecyclerview
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.recyclerview.widget.GridLayoutManager
@@ -10,14 +11,47 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private val list = ArrayList<Hero>()
+    private var title = "Mode List"
+    private var mode: Int = 0
+
+    companion object {
+        private const val STATE_TITLE = "state_string"
+        private const val STATE_LIST = "state_list"
+        private const val STATE_MODE = "state_mode"
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         rv_heroes.setHasFixedSize(true)
 
+        if(savedInstanceState == null){
+            setActionBarTitle(title)
+            list.addAll(getListHeroes())
+            showRecyclerList()
+            mode = R.id.action_list
+        }else{
+            title = savedInstanceState.getString(STATE_TITLE).toString()
+            val stateList = savedInstanceState.getParcelableArrayList<Hero>(STATE_LIST)
+            val stateMode = savedInstanceState.getInt(STATE_MODE)
+
+            setActionBarTitle(title)
+            if (stateList != null) {
+                list.addAll(stateList)
+            }
+            setMode(stateMode)
+        }
+
         list.addAll(getListHeroes())
         showRecyclerList()
+        setActionBarTitle(title)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        outState.putString(STATE_TITLE, title)
+        outState.putParcelableArrayList(STATE_LIST, list)
+        outState.putInt(STATE_MODE, mode)
     }
     fun getListHeroes(): ArrayList<Hero>{
         val dataName = resources.getStringArray(R.array.data_name)
@@ -35,6 +69,9 @@ class MainActivity : AppCompatActivity() {
         }
         return listHero
     }
+    private fun setActionBarTitle(title: String?) {
+        supportActionBar?.title = title
+    }
 
     private fun showRecyclerList(){
         rv_heroes.layoutManager = LinearLayoutManager(this)
@@ -46,6 +83,11 @@ class MainActivity : AppCompatActivity() {
         rv_heroes.layoutManager = GridLayoutManager(this, 2)
         val gridHeroAdapter = GridHeroAdapter(list)
         rv_heroes.adapter = gridHeroAdapter
+    }
+    private fun showRecyclerCardView() {
+        rv_heroes.layoutManager = LinearLayoutManager(this)
+        val cardViewHeroAdapter = CardViewHeroAdapter(list)
+        rv_heroes.adapter = cardViewHeroAdapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -60,14 +102,19 @@ class MainActivity : AppCompatActivity() {
     private fun setMode(selectedMode: Int) {
         when(selectedMode) {
             R.id.action_list -> {
+                title = "Mode List"
                 showRecyclerList()
             }
             R.id.action_grid -> {
+                title = "Mode Grid"
                 showRecyclerGrid()
             }
             R.id.action_cardview -> {
-
+                title = "Mode CardView"
+                showRecyclerCardView()
             }
         }
+        mode = selectedMode
+        setActionBarTitle(title)
     }
 }
