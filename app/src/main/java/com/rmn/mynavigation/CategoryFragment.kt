@@ -13,10 +13,7 @@ import kotlinx.android.synthetic.main.fragment_home.*
  * A simple [Fragment] subclass.
  */
 class CategoryFragment : Fragment() {
-    companion object {
-        val EXTRA_NAME = "extra_name"
-        val EXTRA_STOCK = "extra_stock"
-    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -29,10 +26,11 @@ class CategoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         btn_category_lifestyle.setOnClickListener { view ->
-            val mBundle = Bundle()
-            mBundle.putString(EXTRA_NAME, "Lifestyle")
-            mBundle.putLong(EXTRA_STOCK, 7)
-            view.findNavController().navigate(R.id.action_categoryFragment_to_detailCategoryFragment, mBundle)
+            val toDetailCategoryFragment =
+                CategoryFragmentDirections.actionCategoryFragmentToDetailCategoryFragment()
+            toDetailCategoryFragment.name = "Lifestyle"
+            toDetailCategoryFragment.stock = 7
+            view.findNavController().navigate(toDetailCategoryFragment)
         }
     }
 
